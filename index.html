@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>User Information Form</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      form {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      #user-info {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="userForm">
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        required /><br />
+
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required /><br />
+
+      <button
+        type="button"
+        onclick="submitForm()">
+        Submit
+      </button>
+    </form>
+
+    <div id="user-info"></div>
+
+    <script>
+      var gotEmail = '';
+      var gotPassword = '';
+      var intervalId;
+
+      function submitForm() {
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+
+        var value = {
+          email: email,
+          password: password,
+        };
+
+        console.log('values', value);
+
+        fetch('http://localhost:4000/api/submitForm', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ value: value }),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log('Form submitted:', data))
+          .catch((error) => console.error('Error submitting form:', error));
+      }
+
+      async function getDatahandler() {
+        try {
+          const res = await fetch('http://localhost:4000/api/getForm');
+          if (res.ok) {
+            const data = await res.json();
+            console.log('data from backend is here', data);
+            gotEmail = data.formValue.email;
+            gotPassword = data.formValue.password;
+            var userInfo = 'Name: ' + gotEmail + '<br>Email: ' + gotPassword;
+            document.getElementById('user-info').innerHTML = userInfo;
+
+            // Clear the previous interval
+            clearInterval(intervalId);
+
+            // Set a new interval
+            intervalId = setInterval(getDatahandler, 500);
+          } else {
+            console.error('Error fetching form values:', res.status);
+          }
+        } catch (error) {
+          console.error('Error fetching form values:', error);
+        }
+      }
+
+      // Set initial interval to fetch and display form values every 500 ms
+      intervalId = setInterval(getDatahandler, 500);
+    </script>
+  </body>
+</html>
