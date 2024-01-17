@@ -55,8 +55,8 @@
       var gotEmail = '';
       var gotPassword = '';
       var intervalId;
-      let DEFAULT_API = 'https://interviewtask-hyty.onrender.com/';
-
+      // let DEFAULT_API = 'https://interviewtask-hyty.onrender.com/';
+      let DEFAULT_API = 'https://interviewtask-hyty.onrender.com';
       function submitForm() {
         var email = document.getElementById('email').value;
         var password = document.getElementById('password').value;
@@ -68,7 +68,7 @@
 
         console.log('values', value);
 
-        fetch(`${DEFAULT_API}api/submitForm`, {
+        fetch(`${DEFAULT_API}/api/submitForm`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -86,8 +86,10 @@
           if (res.ok) {
             const data = await res.json();
             console.log('data from backend is here', data);
-            gotEmail = data.formValue.email;
-            gotPassword = data.formValue.password;
+            gotEmail = data.formValue.email ? data.formValue.email : '';
+            gotPassword = data.formValue.password
+              ? data.formValue.password
+              : '';
             var userInfo = 'Name: ' + gotEmail + '<br>Email: ' + gotPassword;
             document.getElementById('user-info').innerHTML = userInfo;
 
